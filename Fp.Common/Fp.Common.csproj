@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>Fp.Common</PackageId>
+    <PackageVersion>1.0.0-beta1</PackageVersion>
+    <Authors>Stuart Davies</Authors>
+    <Description>C# functional programming library</Description>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>First release</PackageReleaseNotes>
+    <Copyright>Copyright 2017 (c) Contoso Corporation. All rights reserved.</Copyright>
+    <PackageTags>Fp Functional</PackageTags>
+  </PropertyGroup>
+
+</Project>
