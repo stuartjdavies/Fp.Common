@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>Fp.Common</PackageId>
-    <PackageVersion>1.0.0-beta1</PackageVersion>
+    <PackageVersion>1.0.0-beta2</PackageVersion>
     <Authors>Stuart Davies</Authors>
     <Description>C# functional programming library</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
