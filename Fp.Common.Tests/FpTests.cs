@@ -42,7 +42,8 @@ namespace Fp.Common.Tests
         {
             int add(int x, int y) => x + y;
             
-            var Inc = (new Func<int, int, int>(add)).Curry()(1);
+            var Inc = (new Func<int, int, int>(add))
+                      .Curry()(1);
 
             Inc(1).Should().Equals(2);
         }
