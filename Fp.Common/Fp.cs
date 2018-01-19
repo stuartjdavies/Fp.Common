@@ -19,4 +19,13 @@ namespace Fp.Common
 
         public static T Id<T>(T v) => v;
     }
+
+    public static class FpExt
+    {
+        public static Func<A, C> Compose<A, B, C>(this Func<A, B> f, Func<B, C> g)
+        => Fp.Compose(f, g);
+
+        public static Func<A, Func<B, C>> Curry<A, B, C>(this Func<A, B, C> f)
+        => Fp.Curry(f);
+    }
 }
