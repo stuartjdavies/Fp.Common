@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Fp.Common
 {   
@@ -27,5 +28,8 @@ namespace Fp.Common
 
         public static Func<A, Func<B, C>> Curry<A, B, C>(this Func<A, B, C> f)
         => Fp.Curry(f);
+
+        public static T Reduce<T>(this IEnumerable<T> xs, Func<T, T, T> f)
+        => xs.Aggregate(f);
     }
 }
