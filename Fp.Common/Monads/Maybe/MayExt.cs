@@ -4,10 +4,10 @@ namespace Fp.Common.Monads.MaybeMonad
 {
     public static class MaybeExt
     {
-        public static Maybe<T> ToSomething<T>(this T v)
-        => Maybe<T>.Just(v);
+        public static IMaybe<T> ToJust<T>(this T v)
+        => Maybe.Just(v);
 
-        public static Maybe<B> FMap<A, B>(this Maybe<A> m, Func<A, B> f)
+        public static IMaybe<B> FMap<A, B>(this IMaybe<A> m, Func<A, B> f)
         {
             switch (m)
             {
@@ -20,7 +20,7 @@ namespace Fp.Common.Monads.MaybeMonad
             }
         }
 
-        public static bool IsJust<A>(this Maybe<A> m)
+        public static bool IsJust<A>(this IMaybe<A> m)
         {
             switch (m)
             {
@@ -33,17 +33,17 @@ namespace Fp.Common.Monads.MaybeMonad
             }
         }
 
-        public static bool IsNothing<A>(this Maybe<A> m)
+        public static bool IsNothing<A>(this IMaybe<A> m)
         => !IsJust(m);
 
-        public static B Match<A, B>(this Maybe<A> m,
-                                    Func<A, B> onSomething,
+        public static B Match<A, B>(this IMaybe<A> m,
+                                    Func<A, B> onJust,
                                     Func<B> onNothing)
         {
             switch (m)
             {
                 case Just<A> s:
-                    return onSomething(s.Value);
+                    return onJust(s.Value);
                 case Nothing<A> n:
                     return onNothing();
                 default:
@@ -51,7 +51,7 @@ namespace Fp.Common.Monads.MaybeMonad
             }
         }
 
-        public static Maybe<B> Bind<A, B>(this Maybe<A> m, Func<A, Maybe<B>> f)
+        public static IMaybe<B> Bind<A, B>(this IMaybe<A> m, Func<A, IMaybe<B>> f)
         {
             switch (m)
             {
@@ -63,5 +63,40 @@ namespace Fp.Common.Monads.MaybeMonad
                     throw new InvalidCastException("Invalid Maybe State");
             }
         }
+
+        public static IMaybe<T> ToMaybe<T>(this T value)
+        => new Just<T>(value);
+
+        public static IMaybe<TB> SelectMany<TA, TB>(this IMaybe<TA> a,
+            Func<TA, IMaybe<TB>> selector)
+        => a.Bind(selector);
+
+        public static IMaybe<TR> SelectMany<TA, TB, TR>(this IMaybe<TA> a,
+            Func<TA, IMaybe<TB>> selector,
+            Func<TA, TB, TR> resultSelector)
+        => a.Bind(v => selector(v).Bind(b => resultSelector(v, b).ToMaybe()));
+
+
+        public static IMaybe<TB> Map<TA, TB>(this IMaybe<TA> a, Func<TA, TB> selector)
+        => a.Bind(v => selector(v).ToMaybe());
+
+        public static A GetOrDefault<A>(this IMaybe<A> m, A a)
+        => m.Match(Fp.Id, () => a);
+
+        public static A GetOrElse<A>(this IMaybe<A> m, Func<A> f)
+        => m.Match(Fp.Id, () => f());
+
+        public static B MatchF<A, B>(this IMaybe<A> m,
+                                    (Func<A, B> onJust, Func<B> onNothing) fs)
+        => m.Match(fs.onJust, fs.onNothing);
+
+        public static A GetOrFail<A>(this IMaybe<A> m, string errorMsg)
+        => m.Match(Fp.Id, () => throw new Exception(errorMsg));
+
+        public static A GetOrThrow<A>(this IMaybe<A> m, Exception ex)                        
+        => m.Match(Fp.Id, () => throw ex);
+
+        public static IMaybe<A> FilterM<A>(this IMaybe<A> m, Func<A, bool> f)
+        => m.Match(v => f(v) ? m : new Nothing<A>(), () => m);
     }
 }

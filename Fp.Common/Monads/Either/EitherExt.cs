@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Fp.Common.Monads.EitherMonad
 {
     public static class EitherExt
     {
-        public static TResult Match<TResult, TLeft, TRight>(this Either<TLeft, TRight> m,
+        public static TResult Match<TResult, TLeft, TRight>(this IEither<TLeft, TRight> m,
                                                             Func<TLeft, TResult> onLeft,
                                                             Func<TRight, TResult> onRight)
         {
@@ -21,7 +20,7 @@ namespace Fp.Common.Monads.EitherMonad
             }
         }
 
-        public static IEnumerable<TResult> SelectLeft<TLeft, TRight, TResult>(this IEnumerable<Either<TLeft, TRight>> ms, Func<TLeft, TResult> f)
+        public static IEnumerable<TResult> SelectLeft<TLeft, TRight, TResult>(this IEnumerable<IEither<TLeft, TRight>> ms, Func<TLeft, TResult> f)
         {
             var xs = new List<TResult>();
 
@@ -38,7 +37,7 @@ namespace Fp.Common.Monads.EitherMonad
             return xs;
         }
 
-        public static IEnumerable<TResult> SelectRight<TLeft, TRight, TResult>(this IEnumerable<Either<TLeft, TRight>> ms, Func<TRight,TResult> f)
+        public static IEnumerable<TResult> SelectRight<TLeft, TRight, TResult>(this IEnumerable<IEither<TLeft, TRight>> ms, Func<TRight,TResult> f)
         {
             var xs = new List<TResult>();
 
@@ -55,7 +54,7 @@ namespace Fp.Common.Monads.EitherMonad
             return xs;
         }
 
-        public static bool IsRight<TLeft, TRight>(this Either<TLeft, TRight> m)
+        public static bool IsRight<TLeft, TRight>(this IEither<TLeft, TRight> m)
         {
             switch (m)
             {
@@ -68,20 +67,20 @@ namespace Fp.Common.Monads.EitherMonad
             }
         }
 
-        public static bool IsLeft<TLeft, TRight>(this Either<TLeft, TRight> m)
+        public static bool IsLeft<TLeft, TRight>(this IEither<TLeft, TRight> m)
         => !IsRight(m);
 
-        public static Either<TLeft, TRight> ToEither<TLeft, TRight>(this TRight r)
+        public static IEither<TLeft, TRight> ToEither<TLeft, TRight>(this TRight r)
         => Either<TLeft, TRight>.ReturnRight(r);
 
 
-        public static Either<TLeft, TRight> ReturnRight<TLeft, TRight>(this TRight r)
+        public static IEither<TLeft, TRight> ReturnRight<TLeft, TRight>(this TRight r)
         => Either<TLeft, TRight>.ReturnRight(r);
 
-        public static Either<TLeft, TRight> ReturnLeft<TLeft, TRight>(this TLeft r)
+        public static IEither<TLeft, TRight> ReturnLeft<TLeft, TRight>(this TLeft r)
         => Either<TLeft, TRight>.ReturnLeft(r);
 
-        public static Either<TLeft, TRightTo> MapRight<TLeft, TRightFrom, TRightTo>(this Either<TLeft, TRightFrom> m, Func<TRightFrom, TRightTo> f)
+        public static IEither<TLeft, TRightTo> MapRight<TLeft, TRightFrom, TRightTo>(this Either<TLeft, TRightFrom> m, Func<TRightFrom, TRightTo> f)
         {
             switch (m)
             {
@@ -94,7 +93,7 @@ namespace Fp.Common.Monads.EitherMonad
             }
         }
 
-        public static Either<TLeft, TRight1> LeftApplicative<TLeft, TRight1, TRight2>(this Either<TLeft, TRight1> m, Func<TRight1, Either<TLeft, TRight2>> f)
+        public static IEither<TLeft, TRight1> LeftApplicative<TLeft, TRight1, TRight2>(this IEither<TLeft, TRight1> m, Func<TRight1, IEither<TLeft, TRight2>> f)
         {
             switch (m)
             {
@@ -108,7 +107,7 @@ namespace Fp.Common.Monads.EitherMonad
             }
         }
 
-        public static Either<TLeft, TRight> OnLeft<TLeft, TRight>(this Either<TLeft, TRight> m, Action<TLeft> f)
+        public static IEither<TLeft, TRight> OnLeft<TLeft, TRight>(this IEither<TLeft, TRight> m, Action<TLeft> f)
         {
             switch (m)
             {
@@ -122,7 +121,7 @@ namespace Fp.Common.Monads.EitherMonad
             }
         }
 
-        public static Either<TLeft, TRight> OnRight<TLeft, TRight>(this Either<TLeft, TRight> m, Action<TRight> f)
+        public static IEither<TLeft, TRight> OnRight<TLeft, TRight>(this IEither<TLeft, TRight> m, Action<TRight> f)
         {
             switch (m)
             {
@@ -136,7 +135,7 @@ namespace Fp.Common.Monads.EitherMonad
             }
         }
 
-        public static Either<TLeftTo, TRight> MapLeft<TLeftFrom, TLeftTo, TRight>(this Either<TLeftFrom, TRight> m, Func<TLeftFrom, TLeftTo> f)
+        public static IEither<TLeftTo, TRight> MapLeft<TLeftFrom, TLeftTo, TRight>(this IEither<TLeftFrom, TRight> m, Func<TLeftFrom, TLeftTo> f)
         {
             switch (m)
             {
@@ -149,7 +148,7 @@ namespace Fp.Common.Monads.EitherMonad
             }
         }
 
-        public static Either<TLeft, TRightTo> Bind<TLeft, TRightFrom, TRightTo>(this Either<TLeft, TRightFrom> m, Func<TRightFrom, Either<TLeft, TRightTo>> f)
+        public static IEither<TLeft, TRightTo> Bind<TLeft, TRightFrom, TRightTo>(this IEither<TLeft, TRightFrom> m, Func<TRightFrom, Either<TLeft, TRightTo>> f)
         {
             switch (m)
             {
@@ -161,5 +160,51 @@ namespace Fp.Common.Monads.EitherMonad
                     throw new InvalidCastException("Invalid Either State");
             }
         }
+
+        public static R MatchF<TLeft, TRight, R>(this IEither<TLeft,TRight> m,
+                                                (Func<TLeft, R> onLeft, Func<TRight, R> onRight) fs)
+        => m.Match(fs.onLeft, fs.onRight);
+
+        public static TRight GetRightOrDefault<TLeft, TRight>(this IEither<TLeft, TRight> m, TRight d)
+        => m.Match(_ => d, Fp.Id);
+
+        public static TRight GetRightOrElse<TLeft, TRight>(this IEither<TLeft, TRight> m, Func<TRight> f)
+        => m.Match(l => f(), Fp.Id);
+
+        public static TRight GetRightOrFail<TLeft, TRight>(this IEither<TLeft, TRight> m, string errorMsg)
+        => m.Match(_ => throw new Exception(errorMsg), Fp.Id);
+
+        public static TRight GetRightOrThrow<TLeft, TRight>(this IEither<TLeft, TRight> m, Exception ex)
+        => m.Match(_ => throw ex, Fp.Id);
+
+        public static TLeft GetLeftOrDefault<TLeft, TRight>(this IEither<TLeft, TRight> m, TLeft d)
+        => m.Match(Fp.Id, _ => d);
+
+        public static TLeft GetLeftOrElse<TLeft, TRight>(this IEither<TLeft, TRight> m, Func<TLeft> f)
+        => m.Match(Fp.Id, r => f());
+
+        public static TLeft GetLeftOrFail<TLeft, TRight>(this IEither<TLeft, TRight> m, string errorMsg)
+        => m.Match(Fp.Id, _ => throw new Exception(errorMsg));
+
+        public static TLeft GetLeftOrThrow<TLeft, TRight>(this IEither<TLeft, TRight> m, Exception ex)
+        => m.Match(Fp.Id, _ => throw ex);
+
+        public static IEither<TRight, TLeft> Flip<TLeft, TRight>(this IEither<TLeft, TRight> m)
+        => m.Match(l => (IEither<TRight, TLeft>) new Right<TRight, TLeft>(l), r => new Left<TRight, TLeft>(r));
+
+        public static Either<TLeft, TRightR> Select<TLeft, TRight, TRightR>(this IEither<TLeft, TRight> e, Func<TRight, TRightR> f)
+        => e.Match<Either<TLeft, TRightR>, TLeft, TRight>(left => new Left<TLeft, TRightR>(left),
+                                                          right => new Right<TLeft, TRightR>(f(right)));
+
+        public static IEither<TLeft, TRightR> SelectMany<TLeft, TRight, TRightR>(this IEither<TLeft, TRight> e, Func<TRight, Either<TLeft, TRightR>> f)
+        => e.Bind(f);
+
+        public static IEither<TLeft, TRightR> SelectMany<TLeft, TRightA, TRightB, TRightR>(this IEither<TLeft, TRightA> e, Func<TRightA, Either<TLeft, TRightB>> f, Func<TRightA, TRightB, TRightR> g)
+        => e.Match(l => new Left<TLeft, TRightR>(l),
+                   a => f(a)
+                        .Bind(b => Either<TLeft, TRightR>.ReturnRight(g(a, b))));        
+
+        public static IEither<TLeft, TRightR> Map<TLeft, TRight, TRightR>(this IEither<TLeft, TRight> a, Func<TRight, TRightR> selector)
+        => a.Bind(v => new Right<TLeft, TRightR>(selector(v)));
     }
 }
