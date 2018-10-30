@@ -1,5 +1,7 @@
 ﻿using FluentAssertions;
 using Fp.Common.Monads.MaybeMonad;
+using static Fp.Common.Monads.MaybeMonad.MaybeHelpers;
+using System;
 using Xunit;
 
 namespace Fp.Common.Tests
@@ -8,8 +10,8 @@ namespace Fp.Common.Tests
     {
         [Fact]
         public void Maybe_Verify_FromBind_SadPath()
-        => (from a in "Hello ".ToMaybe()
-            from b in new Nothing<string>()
+        => (from a in Just("Hello ")
+            from b in Nothing<string>()
             from c in "World!".ToMaybe()
             from d in " :)".ToMaybe()
             select a + b + c + d)

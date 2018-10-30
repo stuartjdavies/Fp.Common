@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
+using static Fp.Common.FpHelpers;
 
 namespace Fp.Common.Tests
 {
@@ -17,7 +18,7 @@ namespace Fp.Common.Tests
         [Fact]
         public void Identity_Tests()
         => (new[] { 1, 2, 3 })
-           .Select(Fp.Id)
+           .Select(Id)
            .Count()
            .Should()
            .Equals(new[] { 1, 2, 3 });

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Fp.Common.Monads.MaybeMonad
 {
-    public static class Maybe
+    public static class MaybeHelpers
     {
         public static IMaybe<T> Nothing<T>() 
         => new Nothing<T>();
